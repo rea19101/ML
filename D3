@@ -1,0 +1,80 @@
+#import pandas as 'pd' 
+import pandas as pd
+
+#import numpy as 'np' 
+import numpy as np
+
+import csv 
+from nltk import metrics, stem, tokenize 
+from nltk.metrics.distance import edit_distance
+
+import os 
+dir_path = os.getcwd()
+
+def normalize(s, to_remove): 
+    # DONE
+    # 1. remove hyphens 
+    # 2. remove spaces
+    words = tokenize.wordpunct_tokenize(s.lower().strip())
+    string = ' '.join([stemmer.stem(w) for w in words])
+    
+    for char in to_remove:
+        string = string.replace(char, '') 
+        
+    return string 
+
+def fuzzy_match(s1, s2):
+    return edit_distance(normalize(s1, []), normalize(s2, []))
+
+def load_data(filename):
+    
+    #importing 'mock.data' csv file and reading first 5 rows 
+    data = pd.read_csv(filename)
+    return data
+    
+    #with open ('mock.data.csv', 'r') as f: 
+        #reader= csv.reader(f)
+        #your_list= list(reader) 
+
+    #return your_list
+
+if __name__ == '__main__':
+        
+    #print(list(data))
+    
+    #print(len(data['id']))
+    
+    ##converting to csv to list 
+    
+        
+    data = load_data("mock.data.csv")
+    
+    #normalizing data 
+    stemmer = stem.PorterStemmer() 
+    
+    #normalize('hello')
+    #print(fuzzy_match('hello', 'helloabcd'))
+    #run it separately fuzzy string matching on dif columns    
+    
+    list = []
+    for idx, row in data.iterrows():
+        list.append(normalize(row['phone number'] + row['first_name'] + row['last_name'] +row['address'], ['-', ' ']))
+    
+    #for item1 in list: 
+        #for item2 in list: 
+            #print(fuzzy_match(item1, item2))
+    
+    test_data = load_data("test.data.csv")
+    #print(test_data) 
+    
+    test_list = []
+    for idx, row in test_data.iterrows():
+        test_list.append(normalize(str(row['phone number']) + str(row['first_name']) + str(row['last_name']) +str(row['address']), ['-', ' ']))  
+    
+    for test_row in test_list:
+        for data_row in list: 
+            print(fuzzy_match(test_row, data_row)) 
+            
+    
+#def fuzzy_match(s1, s2, max_dist=3):
+    #return metrics.edit_distance(normalize(s1), normalize(s2)) <= max_dist
